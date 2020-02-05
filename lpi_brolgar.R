@@ -35,8 +35,8 @@ lpi_na_fill <- function(lpi_pop, lpi_long = lpi_long){
   } else {
       
     lpi_lm <- lm(log_abnd ~ year, data = lpi_df)
-    lpi_interp <- na.approx(lpi_df$log_abnd)
-    diff_pred <- diff(lpi_interp)
+    pred_lpi <- na.approx(lpi_df$log_abnd)
+    diff_pred <- diff(pred_lpi)
     sum_lambda <- sum(diff_pred)
     mean_lambda <- mean(diff_pred)
     Rsq <- summary(lpi_lm)$r.sq
@@ -45,11 +45,11 @@ lpi_na_fill <- function(lpi_pop, lpi_long = lpi_long){
     }
   
   lpi_out <- data.frame(ID = lpi_pop,
-                        true_abnd = lpi_df$abundance_est,
                         class = lpi_df$Class,
                         binomial = lpi_df$Binomial,
                         year = lpi_df$year,
-                        abnd_out = c(NA, diff_pred), 
+                        true_abnd = lpi_df$abundance_est,
+                        pred_abnd = pred_lpi,                                                 diff_out = c(NA, diff_pred), 
                         sum_lambda = sum_lambda,
                         mean_lambda = mean_lambda,
                         Rsq = Rsq,
@@ -60,6 +60,9 @@ lpi_na_fill <- function(lpi_pop, lpi_long = lpi_long){
   }
 
 lpi_fill <- lapply(X = unique(lpi_long$ID), lpi_na_fill, lpi_long = lpi_long)
+
+lpi_filled <- do.call(rbind, lpi_fill)
+
 
 
 
